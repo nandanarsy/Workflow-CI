@@ -15,10 +15,11 @@ jobs:
       - name: Set up Miniconda
         uses: conda-incubator/setup-miniconda@v3
         with:
-          auto-update-conda: true
-          python-version: "3.12"
-          activate-environment: base
-          auto-activate-base: true
+          miniforge-variant: Mambaforge
+          miniforge-version: latest
+          auto-update-conda: false
+          activate-environment: ""
+          use-mamba: true
 
       - name: Verify Conda
         shell: bash -l {0}
