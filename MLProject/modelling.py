@@ -46,4 +46,4 @@ with tempfile.TemporaryDirectory() as tmp:
         json.dump({"accuracy": acc}, f, indent=4)
     mlflow.log_artifact(metric_path, run_id=run_id)
 
-mlflow.sklearn.log_model(model, artifact_path="model", run_id=run_id)
+mlflow.sklearn.log_model(model, artifact_path="model")
