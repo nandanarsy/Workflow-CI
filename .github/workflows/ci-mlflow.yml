@@ -16,7 +16,7 @@ jobs:
         uses: conda-incubator/setup-miniconda@v3
         with:
           miniforge-variant: Mambaforge
-          miniforge-version: latest
+          miniforge-version: 23.11.0-0
           auto-update-conda: false
           activate-environment: ""
           use-mamba: true
