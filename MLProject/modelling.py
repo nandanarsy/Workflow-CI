@@ -31,19 +31,18 @@ preds = model.predict(X_test)
 acc = accuracy_score(y_test, preds)
 cm = confusion_matrix(y_test, preds)
 
-with mlflow.start_run():
-    mlflow.log_metric("accuracy", acc)
+mlflow.log_metric("accuracy", acc)
 
-    with tempfile.TemporaryDirectory() as tmp:
-        cm_path = f"{tmp}/confusion_matrix.png"
-        ConfusionMatrixDisplay(cm).plot()
-        plt.savefig(cm_path)
-        plt.close()
-        mlflow.log_artifact(cm_path)
+with tempfile.TemporaryDirectory() as tmp:
+    cm_path = f"{tmp}/training_confusion_matrix.png"
+    ConfusionMatrixDisplay(cm).plot()
+    plt.savefig(cm_path)
+    plt.close()
+    mlflow.log_artifact(cm_path)
 
-        metric_path = f"{tmp}/metric_info.json"
-        with open(metric_path, "w") as f:
-            json.dump({"accuracy": acc}, f, indent=4)
-        mlflow.log_artifact(metric_path)
+    metric_path = f"{tmp}/metric_info.json"
+    with open(metric_path, "w") as f:
+        json.dump({"accuracy": acc}, f, indent=4)
+    mlflow.log_artifact(metric_path)
 
-    mlflow.sklearn.log_model(model, artifact_path="model")
+mlflow.sklearn.log_model(model, artifact_path="model")
