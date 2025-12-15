@@ -14,8 +14,6 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--data_path", type=str, required=True)
 args = parser.parse_args()
 
-mlflow.set_experiment("CI_MLflow_Training")
-
 df = pd.read_csv(args.data_path)
 X = df.drop("Churn", axis=1)
 y = df["Churn"]
@@ -31,18 +29,21 @@ preds = model.predict(X_test)
 acc = accuracy_score(y_test, preds)
 cm = confusion_matrix(y_test, preds)
 
-mlflow.log_metric("accuracy", acc)
+run = mlflow.active_run()
+run_id = run.info.run_id
+
+mlflow.log_metric("accuracy", acc, run_id=run_id)
 
 with tempfile.TemporaryDirectory() as tmp:
     cm_path = f"{tmp}/training_confusion_matrix.png"
     ConfusionMatrixDisplay(cm).plot()
     plt.savefig(cm_path)
     plt.close()
-    mlflow.log_artifact(cm_path)
+    mlflow.log_artifact(cm_path, run_id=run_id)
 
     metric_path = f"{tmp}/metric_info.json"
     with open(metric_path, "w") as f:
         json.dump({"accuracy": acc}, f, indent=4)
-    mlflow.log_artifact(metric_path)
+    mlflow.log_artifact(metric_path, run_id=run_id)
 
-mlflow.sklearn.log_model(model, artifact_path="model")
+mlflow.sklearn.log_model(model, artifact_path="model", run_id=run_id)
