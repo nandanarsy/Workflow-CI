@@ -1,5 +1,6 @@
 import argparse
 import json
+import os
 import tempfile
 import pandas as pd
 import mlflow
@@ -29,8 +30,7 @@ preds = model.predict(X_test)
 acc = accuracy_score(y_test, preds)
 cm = confusion_matrix(y_test, preds)
 
-run = mlflow.active_run()
-run_id = run.info.run_id
+run_id = os.environ.get("MLFLOW_RUN_ID")
 
 mlflow.log_metric("accuracy", acc, run_id=run_id)
 
