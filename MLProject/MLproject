@@ -1,0 +1,12 @@
+name: churn-training-project
+
+conda_env: conda.yaml
+
+entry_points:
+  main:
+    parameters:
+      data_path:
+        type: path
+        default: churn-bigml-80_preprocessing/churn_processed.csv
+    command: >
+      python modelling.py --data_path {data_path}
