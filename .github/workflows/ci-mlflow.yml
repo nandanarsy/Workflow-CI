@@ -1,33 +1,40 @@
-name: CI-MLflow-Basic
+name: CI-MLflow-Project
 
 on:
   push:
     branches: [ "main" ]
 
 jobs:
-  train:
+  mlflow-ci:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - name: Set up Miniconda
+        uses: conda-incubator/setup-miniconda@v3
         with:
-          python-version: "3.12.7"
+          auto-update-conda: true
+          python-version: "3.12"
+          activate-environment: base
+          auto-activate-base: true
+
+      - name: Verify Conda
+        shell: bash -l {0}
+        run: |
+          conda --version
+          python --version
 
       - name: Install MLflow
+        shell: bash -l {0}
         run: |
           pip install mlflow==2.19.0
 
       - name: Run MLflow Project
+        shell: bash -l {0}
         run: |
           mlflow run MLProject
-
-      - name: Get latest MLflow run id
-        run: |
-          echo "RUN_ID=$(ls mlruns/1 | tail -n 1)" >> $GITHUB_ENV
 
       - name: Upload MLflow artifacts
         uses: actions/upload-artifact@v4
@@ -35,10 +42,12 @@ jobs:
           name: mlflow-artifacts
           path: mlruns
 
-      - name: Build Docker Model
+      - name: Build Docker Image
+        shell: bash -l {0}
         run: |
+          RUN_ID=$(ls mlruns/1 | tail -n 1)
           mlflow models build-docker \
-            -m "runs:/$(ls mlruns/1 | tail -n 1)/model" \
+            -m runs:/1/$RUN_ID/model \
             -n ${{ secrets.DOCKERHUB_USERNAME }}/churn-mlflow-model
 
       - name: Login to Docker Hub
